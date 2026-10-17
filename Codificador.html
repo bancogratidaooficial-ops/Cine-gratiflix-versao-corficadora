@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CODIFICADOR - CINE GRATIFLIX</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0a0a0a;color:#fff;font-family:Arial;padding:12px}
+.box{background:#111;border:1px solid #222;border-radius:12px;padding:12px;margin-bottom:12px}
+input,select,textarea{width:100%;padding:12px;background:#000;border:1px solid #333;color:#fff;border-radius:8px;margin:6px 0}
+button{padding:12px 16px;border:0;border-radius:8px;font-weight:900;cursor:pointer;margin:4px}
+.btn-verde{background:#00ff88;color:#000}.btn-vermelho{background:#f00;color:#fff}.btn-amarelo{background:#ffcc00;color:#000}
+.filme-item{display:flex;justify-content:space-between;background:#000;padding:8px;margin:4px 0;border-radius:8px;font-size:12px}
+.chip{display:inline-block;background:#222;border:1px solid #333;padding:6px 10px;border-radius:20px;margin:3px;font-size:11px}
+.chip.ativo{background:#f00;border-color:#f00}
+</style>
+</head>
+<body>
+<h2>⚙️ CODIFICADOR CINE GRATIFLIX - 89 FILMES</h2>
+
+<div class="box">
+<b>📁 GERENCIAR PASTAS (GÊNEROS)</b>
+<div style="display:flex;gap:6px"><input id="novaPasta" placeholder="Nome da pasta ex: AÇÃO"><button class="btn-amarelo" onclick="addPasta()">+ PASTA</button></div>
+<div id="listaPastas"></div>
+</div>
+
+<div class="box">
+<b>🎬 ADICIONAR FILME</b>
+<input id="tFilme" placeholder="Título do filme ex: Hitimam">
+<input id="idVideo" placeholder="ID do YouTube ex: x5QSOVQJM2w ou link completo https://youtu.be/...">
+<select id="tagFilme"></select>
+<button class="btn-verde" onclick="addFilme()">+ ADICIONAR FILME</button>
+<hr>
+<b>📥 COLAR VÁRIOS LINKS DE UMA VEZ (Aline)</b>
+<textarea id="bulkLinks" rows="6" placeholder="Cole aqui todos os links https://youtu.be/... um por linha"></textarea>
+<button class="btn-amarelo" onclick="addBulk()">ADICIONAR TODOS OS LINKS COMO LANÇAMENTO</button>
+</div>
+
+<div class="box">
+<b>📋 FILMES CADASTRADOS (<span id="totalFilmes">0</span>)</b>
+<div id="listaFilmes"></div>
+</div>
+
+<div class="box">
+<b>🔗 GERAR LINK CODIFICADO E INDEX.HTML PERMANENTE</b>
+<button class="btn-verde" style="width:100%;padding:16px" onclick="gerar()">GERAR TUDO</button>
+<p>Link Codificado:</p>
+<textarea id="outLink" rows="4" readonly></textarea>
+<button class="btn-amarelo" onclick="copiarLink()">COPIAR LINK</button>
+<button class="btn-verde" onclick="abrirLink()">ABRIR LINK E TESTAR</button>
+<hr>
+<p>index.html permanente (já com filmes fixos):</p>
+<textarea id="outIndex" rows="8" readonly></textarea>
+<button class="btn-verde" onclick="copiarIndex()">COPIAR INDEX.HTML</button>
+</div>
+
+<script>
+let generos = JSON.parse(localStorage.getItem('cine_generos')||'null') || ["LANÇAMENTO","AÇÃO","BIBLICOS","TERROR","COMÉDIA"];
+let filmes = JSON.parse(localStorage.getItem('cine_filmes_pastas')||'null') || [
+{"t":"Hitimam","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/x5QSOVQJM2w/hqdefault.jpg","vid":"x5QSOVQJM2w"},
+{"t":"Davi e Golias","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/8Iw8z2bZg6s/hqdefault.jpg","vid":"8Iw8z2bZg6s"},
+{"t":"Filme 01","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/Xz1YqiFiNZQ/hqdefault.jpg","vid":"Xz1YqiFiNZQ"},
+{"t":"Filme 02","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/32zwH-IvzAs/hqdefault.jpg","vid":"32zwH-IvzAs"},
+{"t":"Filme 03","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/ouC258B1jKo/hqdefault.jpg","vid":"ouC258B1jKo"},
+{"t":"Filme 04","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/ZKXBcPbFTMs/hqdefault.jpg","vid":"ZKXBcPbFTMs"},
+{"t":"Filme 05","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/qKRyqXnwbNI/hqdefault.jpg","vid":"qKRyqXnwbNI"},
+{"t":"Filme 06","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/MUZ4FpGzsqU/hqdefault.jpg","vid":"MUZ4FpGzsqU"},
+{"t":"Filme 07","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/tMGWE_qqxkE/hqdefault.jpg","vid":"tMGWE_qqxkE"},
+{"t":"Filme 08","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/bSKIBqSHrNI/hqdefault.jpg","vid":"bSKIBqSHrNI"},
+{"t":"Filme 09","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/0hNT_vhdCcc/hqdefault.jpg","vid":"0hNT_vhdCcc"},
+{"t":"Filme 10","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/Gnv_rD6sJgM/hqdefault.jpg","vid":"Gnv_rD6sJgM"},
+{"t":"Filme 11","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/kDBSwSeSd8o/hqdefault.jpg","vid":"kDBSwSeSd8o"},
+{"t":"Filme 12","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/t89cAmA3oec/hqdefault.jpg","vid":"t89cAmA3oec"},
+{"t":"Filme 13","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/PuVuB9iKZGg/hqdefault.jpg","vid":"PuVuB9iKZGg"},
+{"t":"Filme 14","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/eBNd-V4duWY/hqdefault.jpg","vid":"eBNd-V4duWY"},
+{"t":"Filme 15","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/RJdueseYras/hqdefault.jpg","vid":"RJdueseYras"},
+{"t":"Filme 16","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/VPT0gE8Ve3I/hqdefault.jpg","vid":"VPT0gE8Ve3I"},
+{"t":"Filme 17","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/t5nv9FneoZs/hqdefault.jpg","vid":"t5nv9FneoZs"},
+{"t":"Filme 18","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/SxVNIJlcM7o/hqdefault.jpg","vid":"SxVNIJlcM7o"},
+{"t":"Filme 19","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/-6r0nt0gmWY/hqdefault.jpg","vid":"-6r0nt0gmWY"},
+{"t":"Filme 20","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/cZYOWew11MM/hqdefault.jpg","vid":"cZYOWew11MM"},
+{"t":"Filme 21","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/KSA8LJBcuBw/hqdefault.jpg","vid":"KSA8LJBcuBw"},
+{"t":"Filme 22","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/ifEyKWNjSHQ/hqdefault.jpg","vid":"ifEyKWNjSHQ"},
