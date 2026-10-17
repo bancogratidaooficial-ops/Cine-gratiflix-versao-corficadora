@@ -28,7 +28,15 @@
 const LINK_GRUPO="https://chat.whatsapp.com/BtNurXoNfSg2V2QbXTasC7s";
 function carregarDoLink(){let p=new URLSearchParams(location.search);let d=p.get('data');if(d){try{let j=JSON.parse(decodeURIComponent(escape(atob(d))));if(j.f&&j.g){localStorage.setItem('cine_filmes_pastas',JSON.stringify(j.f));localStorage.setItem('cine_generos',JSON.stringify(j.g));history.replaceState({},'',location.pathname);return j;}}catch(e){}}return null;}
 let doLink=carregarDoLink();
-let filmesPadrao=doLink?doLink.f:JSON.parse(localStorage.getItem('cine_filmes_pastas')||'null')||[
+<script>
+let filmesPadrao=[
+{"t":"Hitimam",...},
+{"t":"Davi e Golias",...},
+// ... seus 87 filmes aqui
+];
+let generos=["LANÇAMENTO"];
+let filtro="TODOS";
+// resto igual, sem carregarDoLink
 {"t":"Hitimam","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/x5QSOVQJM2w/hqdefault.jpg","vid":"x5QSOVQJM2w"},
 {"t":"Davi e Golias","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/8Iw8z2bZg6s/hqdefault.jpg","vid":"8Iw8z2bZg6s"},
 {"t":"Filme 01","tag":"LANÇAMENTO","img":"https://img.youtube.com/vi/Xz1YqiFiNZQ/hqdefault.jpg","vid":"Xz1YqiFiNZQ"},
